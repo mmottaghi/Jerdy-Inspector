@@ -1,0 +1,407 @@
+
+<!DOCTYPE HTML>
+<html>
+ <head>
+  <title>Live DOM Viewer</title>
+  <style>
+   h1 { margin: 0; }
+   h2 { font-size: small; margin: 1em 0 0; }
+   p, ul, pre { margin: 0; }
+   p { border: inset thin; }
+   textarea { width: 100%; -width: 99%; height: 8em; border: 0; }
+   iframe { width: 100%; height: 12em; border: 0; }
+/* iframe.large { height: 24em; } */
+   pre { border: inset thin; padding: 0.5em; color: gray; }
+   pre samp { color: black; }
+   #dom { border: inset thin; padding: 0.5em 0.5em 0.5em 1em; color: black; min-height: 5em; font-family: monospace; background: white; }
+   #dom ul { padding: 0 0 0 1em; margin: 0; }
+   #dom li { padding: 0; margin: 0; list-style: none; position: relative; }
+   #dom li li { list-style: disc; }
+   #dom .t1 code { color: purple; font-weight: bold; }
+   #dom .t2 { font-style: normal; font-family: monospace; }
+   #dom .t2 .name { color: black; font-weight: bold; }
+   #dom .t2 .value { color: blue; font-weight: normal; }
+   #dom .t3 code, #dom .t4 code, #dom .t5 code { color: gray; }
+   #dom .t7 code, #dom .t8 code { color: green; }
+   #dom span { font-style: italic; font-family: serif; }
+   #dom .t10 code { color: teal; }
+   #dom .misparented, #dom .misparented code { color: red; font-weight: bold; }
+   #dom .unnamed { color: red; font-style: italic; }
+   #dom.hidden, .hidden { visibility: hidden; margin: 0.5em 0; padding: 0; height: 0; min-height: 0; }
+   pre#log { color: black; font: small monospace; }
+   script + p { border: none; font-size: smaller; margin: 0.8em 0.25em 0.1em; }
+   script + p + details { font-size: smaller; margin: 0 0.25em; }
+   script + p + details dl { margin: 0 0 0 1.5em; }
+   script + p + details dl dd { margin: 0 0 0.35em 1em; }
+  </style>
+  <style title="Tree View">
+   #dom li li { list-style: none; }
+   #dom li:first-child::before { position: absolute; top: 0; height: 0.6em; left: -0.75em; width: 0.5em; border-style: none none solid solid; content: ''; border-width: 0.1em; }
+   #dom li:not(:last-child)::after { position: absolute; top: 0; bottom: -0.6em; left: -0.75em; width: 0.5em; border-style: none none solid solid; content: ''; border-width: 0.1em; }
+  </style>
+  <script>
+   if (navigator.userAgent.match('Gecko/(\\d+)') && RegExp.$1 == '20060217' && RegExp.$1 != '00000000') {
+     var style = document.getElementsByTagName('style')[1];
+     style.parentNode.removeChild(style);
+   }
+  </script>
+     <script>
+        function insertAtCaret(areaId,text) {
+            var txtarea = document.getElementById(areaId);
+            var scrollPos = txtarea.scrollTop;
+            var strPos = 0;
+            var br = ((txtarea.selectionStart || txtarea.selectionStart == '0') ? 
+                "ff" : (document.selection ? "ie" : false ) );
+            if (br == "ie") { 
+                txtarea.focus();
+                var range = document.selection.createRange();
+                range.moveStart ('character', -txtarea.value.length);
+                strPos = range.text.length;
+            }
+            else if (br == "ff") strPos = txtarea.selectionStart;
+
+            var front = (txtarea.value).substring(0,strPos);  
+            var back = (txtarea.value).substring(strPos,txtarea.value.length); 
+            txtarea.value=front+text+back;
+            strPos = strPos + text.length;
+            if (br == "ie") { 
+                txtarea.focus();
+                var range = document.selection.createRange();
+                range.moveStart ('character', -txtarea.value.length);
+                range.moveStart ('character', strPos);
+                range.moveEnd ('character', 0);
+                range.select();
+            }
+            else if (br == "ff") {
+                txtarea.selectionStart = strPos;
+                txtarea.selectionEnd = strPos;
+                txtarea.focus();
+            }
+            txtarea.scrollTop = scrollPos;
+        }         
+        function InsertTag(btn)
+        {
+            insertAtCaret('htmlSource', "<" +btn.innerHTML+">");
+        }
+     </script>
+ </head>
+ 
+ <body onload="init()">
+  <h1>Live DOM Viewer</h1>
+  <h2>Markup to test (<a href="data:," id="permalink" rel="bookmark">permalink</a>, <a href="javascript:save()" id="save">save</a>, <a href="javascript:up()">upload</a>, <a href="javascript:down()">download</a>, <!--<a href="javascript:filetestbug()" title="Files the test in the W3C HTML bug database as a testsuite bug">bug</a>,--> <a href="#" onclick="toggleVisibility(this); return false">hide</a>): 
+      <button onclick="InsertTag(this)">table</button>
+      <button onclick="InsertTag(this)">tbody</button>
+      <button onclick="InsertTag(this)">th</button>
+      <button onclick="InsertTag(this)">tr</button>
+      <button onclick="InsertTag(this)">p</button>
+      <button onclick="InsertTag(this)">li</button>
+      <button onclick="InsertTag(this)">select</button>
+      <button onclick="InsertTag(this)">option</button>
+      <button onclick="InsertTag(this)">form</button>
+      <span id="network-status"></span></h2>
+  <p><textarea id="htmlSource" oninput="updateInput(event)" onkeydown="updateInput(event)">&lt;!DOCTYPE html></textarea></p>
+  <h2><a href="data:," id="domview">DOM view</a> (<a href="#" onclick="toggleVisibility(this); return false;">hide</a>, <a href="#" onclick="updateDOM()">refresh</a>):</h2>
+  <ul id="dom"></ul>
+  <h2><a href="data:," id="link">Rendered view</a>: (<a href="#" onclick="toggleVisibility(this); return false;">hide</a><!--, <a href="#" onclick="grow(this)">grow</a>-->):</h2>
+  <p><iframe src="blank.html"></iframe></p> <!-- data:, -->
+  <h2>innerHTML view: (<a href="#" onclick="toggleVisibility(this); return false;">show</a>, <a href="#" onclick="updateDOM()">refresh</a>):</h2>
+  <pre class="hidden">&lt;!DOCTYPE HTML>&lt;html><samp></samp>&lt;/html></pre>
+  <h2>Log: (<a href="#" onclick="toggleVisibility(this); return false;">hide</a>):</h2>
+  <pre id="log">Script not loaded.</pre>
+  <script>
+   var iframe = document.getElementsByTagName('iframe')[0];
+   var textarea = document.getElementsByTagName('textarea')[0];
+   var pre = document.getElementsByTagName('samp')[0];
+   var dom = document.getElementsByTagName('ul')[0];
+   var log = document.getElementById('log');
+   var networkStatus = document.getElementById('network-status');
+   var delayedInputUpdater = 0;
+   var delayedDOMUpdater = 0;
+   var lastString = '';
+   function updateInput(event) {
+     if (delayedInputUpdater)
+       clearTimeout(delayedInputUpdater);
+     delayedInputUpdater = setTimeout(update, 100);
+   }
+   function updateIframe() {
+     while (log.firstChild)
+       log.removeChild(log.lastChild);
+     iframe.contentWindow.document.open();
+     iframe.contentWindow.onerror = function (a, b, c) {
+       record('error: ' + a + ' on line ' + c);
+     }
+     iframe.contentWindow.w = function (s) {
+       if ((iframe.contentWindow.Event) && (s instanceof iframe.contentWindow.Event)) { // why doesn't this work?
+         var target = s.target;
+         if (target instanceof iframe.contentWindow.Node) {
+           if (target instanceof iframe.contentWindow.Element) {
+             target = '<' + target.nodeName;
+             if (target.id) {
+               target += ' id="' + target.id + '"';
+             }
+             target += '>';
+           } else {
+             // ...
+           }
+         } else {
+           target = '"' + target + '"'
+         }
+         var interface = s.toString();
+         var bubbles = s.bubbles ? '; bubbles' : '';
+         var cancelable = s.cancelable ? '; cancelable' : '';
+         record('log: event "' + s.type + '" using interface "' + interface + '" targetted at ' + target + '' + bubbles + cancelable);
+       } else if (typeof s == 'object') {
+         var n = 0;
+         props = '';
+         for (var i in s) {
+           n += 1;
+           if (n < 5) {
+             if (n == 1) {
+               props += ': ';
+             } else {
+               props += ', ';
+             }
+             if (typeof s[i] == 'string' || typeof s[i] == 'object')
+               props += i + '="' + s[i] + '"';
+             else
+               props += i + '=' + s[i];
+           }
+         }
+         if (n >= 5) {
+           props += '...';
+         }
+         props = props.replace(/\n/g, '\\n');
+         record('log: object "' + s + '" (' + n + ' props' + props + ')');
+       } else {
+         record('log: ' + s);
+       }
+     }
+     iframe.contentWindow.document.write(textarea.value);
+     iframe.contentWindow.document.close();
+   }
+   function update() {
+     if (lastString != textarea.value) {
+       document.getElementById('link').href = 'data:text/html;charset=utf-8,' + encodeURIComponent(textarea.value);
+       try {
+         updateIframe(); // clears log
+       } catch (e) {
+         var p = iframe.parentNode;
+         p.removeChild(iframe);
+         iframe = document.createElement('iframe');
+         iframe.setAttribute('src', 'blank.html');
+         p.appendChild(iframe);
+         updateIframe();
+         record('internal error: ' + e.message);
+       }
+       lastString = textarea.value;
+       if (delayedDOMUpdater)
+         clearTimeout(delayedDOMUpdater);
+       delayedDOMUpdater = setTimeout(updateDOM, 100);
+       network('');
+     }
+   }
+   function updateDOM() {
+     while (pre.firstChild) pre.removeChild(pre.firstChild);
+     if (!iframe.contentWindow.document.documentElement)
+       pre.appendChild(document.createTextNode("[no document element]"));
+     else
+       pre.appendChild(document.createTextNode(iframe.contentWindow.document.documentElement.innerHTML));
+     printDOM(dom, iframe.contentWindow.document);
+     document.getElementById('domview').href = 'data:text/plain;charset=utf-8,' + encodeURIComponent('<ul class="domTree">' + dom.innerHTML + '</ul>');
+     document.getElementById('permalink').href = '?' + encodeURIComponent(textarea.value);
+     record('rendering mode: ' + iframe.contentWindow.document.compatMode);
+     if (iframe.contentWindow.document.title)
+       record('document.title: ' + iframe.contentWindow.document.title);
+     else
+       record('document has no title');
+   }
+   function printDOM(ul, node) {
+     while (ul.firstChild) ul.removeChild(ul.firstChild);
+     for (var i = 0; i < node.childNodes.length; i += 1) {
+       var li = document.createElement('li');
+       li.className = 't' + node.childNodes[i].nodeType;
+       if (node.childNodes[i].nodeType == 10) {
+         li.appendChild(document.createTextNode('DOCTYPE: '));
+       }
+       if (node.childNodes[i].nodeName) {
+         var code = document.createElement('code');
+         code.appendChild(document.createTextNode(node.childNodes[i].nodeName));
+         li.appendChild(code);
+       } else {
+         var span = document.createElement('span');
+         span.appendChild(document.createTextNode("no name"));
+         span.className = 'unnamed';
+         li.appendChild(span);
+       }
+       if (node.childNodes[i].nodeValue) {
+         var span = document.createElement('span');
+         span.appendChild(document.createTextNode(node.childNodes[i].nodeValue));
+         li.appendChild(document.createTextNode(': '));
+         li.appendChild(span);
+       }
+       if (node.childNodes[i].attributes)
+         for (var j = 0; j < node.childNodes[i].attributes.length; j += 1) {
+           if (node.childNodes[i].attributes[j].specified) {
+             var attName = document.createElement('code');
+             attName.appendChild(document.createTextNode(node.childNodes[i].attributes[j].nodeName));
+             attName.className = 'attribute name';
+             var attValue = document.createElement('code');
+             attValue.appendChild(document.createTextNode(node.childNodes[i].attributes[j].nodeValue));
+             attValue.className = 'attribute value';
+             var att = document.createElement('span');
+             att.className = 't2';
+             att.appendChild(attName);
+             att.appendChild(document.createTextNode('="'));
+             att.appendChild(attValue);
+             att.appendChild(document.createTextNode('"'));
+             li.appendChild(document.createTextNode(' '));
+             li.appendChild(att);
+           }
+         }
+       if (node.childNodes[i].parentNode == node) {
+         if (node.childNodes[i].childNodes.length) {
+           var ul2 = document.createElement('ul');
+           li.appendChild(ul2);
+           printDOM(ul2, node.childNodes[i]);
+         }
+       } else {
+         li.className += ' misparented';
+       }
+       ul.appendChild(li);
+     }
+   }
+   function toggleVisibility(link) {
+     var n = link.parentNode.nextSibling;
+     if (n.nodeType == 3 /* text node */) n = n.nextSibling; // we should always do this but in IE, text nodes vanish
+     n.className = (n.className == "hidden") ? '' : 'hidden';
+     link.firstChild.data = n.className == "hidden" ? "show" : "hide";
+   }
+/*
+   function grow(link) {
+     var n = link.parentNode.nextSibling;
+     if (n.nodeType == 3 /-* text node *-/) n = n.nextSibling; // we should always do this but in IE, text nodes vanish
+     n.className = (n.className == "large") ? '' : 'large';
+     link.firstChild.data = n.className == "grow" ? "shrink" : "grow";
+   }
+*/
+   function down() {
+     network('downloading...');
+     var request = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+     request.onreadystatechange = function () {
+       network('downloading... ' + request.readyState + '/4');
+       if (request.readyState == 4) {
+         textarea.value = request.responseText;
+         update();
+         network('downloaded');
+       }
+     };
+     request.open('GET', 'clipboard.cgi', true);
+     request.send(null);
+   }
+   function up() {
+     network('uploading...');
+     var request = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+     request.onreadystatechange = function () {
+       network('uploading... ' + request.readyState + '/4');
+       if (request.readyState == 4) {
+         network('uploaded');
+       }
+     };
+     request.open('POST', 'clipboard.cgi', true);
+     request.setRequestHeader('Content-Type', 'text/plain');
+     request.send(textarea.value);
+   }
+   function save() {
+     network('saving...');
+     var request = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+     request.onreadystatechange = function () {
+       network('saving... ' + request.readyState + '/4');
+       if (request.readyState == 4) {
+         network('saved to', location.protocol + '//' + location.host + location.pathname + 'saved/' + request.responseText);
+       }
+     };
+     request.open('POST', 'saved', true);
+     request.setRequestHeader('Content-Type', 'text/plain');
+     request.send(textarea.value);
+   }
+   function filetestbug() {
+     if (!confirm('Are you sure you wish to file a bug to remind you to add this to the W3C HTML test suite?'))
+       return;
+     network('filing...');
+     var request = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+     request.onreadystatechange = function () {
+       network('filing... ' + request.readyState + '/4');
+       if (request.readyState == 4) {
+         network('filed as ', request.responseText);
+       }
+     };
+     request.open('POST', 'file-as-bug', true);
+     request.setRequestHeader('Content-Type', 'text/plain');
+     request.send(textarea.value);
+   }
+   function load(id) {
+     network('loading...');
+     var request = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+     request.onreadystatechange = function () {
+       network('loading... ' + request.readyState + '/4');
+       if (request.readyState == 4) {
+         textarea.value = decodeURIComponent(request.responseText);
+         update();
+         network('loaded');
+       }
+     };
+     request.open('GET', 'saved/' + id + '?mode=data', true);
+     request.send(null);
+   }
+   function init() {
+     var uri = location.search;
+     if (uri.match(/^\?saved=/)) {
+       load(uri.substring(7, uri.length));
+     } else if (uri) {
+       textarea.value = decodeURIComponent(uri.substring(1, uri.length));
+     }
+     update();
+   }
+   function record(s) {
+     log.appendChild(document.createTextNode(s + '\r\n'));
+   }
+   function network(s, a) {
+     while (networkStatus.firstChild) networkStatus.removeChild(networkStatus.firstChild);
+     networkStatus.appendChild(document.createTextNode(s));
+     if (a) {
+       networkStatus.appendChild(document.createTextNode(' '));
+       var link = document.createElement('a');
+       link.appendChild(document.createTextNode(a));
+       link.href = a;
+       networkStatus.appendChild(link);
+     }
+   }
+  </script>
+  <p>This script puts a function <code>w(<var>s</var>)</code> into the
+  global scope of the test page, where <var>s</vaR> is a string or
+  object to output to the log.</p>
+  <details onclick="setTimeout(function () { this.getElementsByTagName('summary')[0].textContent = this.open ? 'Some files are available for testing purposes:' : 'Some files are available for testing purposes, notably &quot;image&quot; is an image.' }.bind(this), 0)">
+    <summary>Some files are available for testing purposes, notably "image" is an image.</summary>
+    <dl>
+     <dt> <code>image</code> and <code>image.swf</code> <dd> a GIF image of two cats
+     <dt> <code>null</code> <dd> a PNG image of the word "null"
+     <dt> <code>flash</code> <dd> a Flash file
+     <dt> <code>flash-as-text</code> and <code>flash-as-text.swf</code> <dd> a Flash file sent as text/plain
+     <dt> <code>flash-as-image.swf</code> <dd> a Flash file sent as image/gif
+     <dt> <code>script</code> <dd> a JS file
+     <dt> <code>style</code> <dd> a CSS file
+     <dt> <code>document</code> <dd> an HTML file
+     <dt> <code>alertdoc</code> <dd> an HTML file with a script that alerts
+     <dt> <code>delayed-image</code> <dd> a GIF image after a two-second pause
+     <dt> <code>delayed-script</code> <dd> a JS file after a two-second pause
+     <dt> <code>xhtml</code> <dd> an XHTML file
+     <dt> <code>xml</code> <dd> an XML file
+     <dt> <code>xml-as-svg</code> <dd> an XML file sent with the SVG MIME type
+     <dt> <code>xml-broken</code> <dd> a malformed XML file
+     <dt> <code>svg</code> <dd> an SVG file
+     <dt> <code>svg-as-xml</code> <dd> an SVG file sent with the XML MIME type
+     <dt> <code>download</code> <dd> the same file as <code>image</code>, but with a Content-Disposition header set to <code>inline</code> with a filename
+    </dl>
+  </details>
+ </body>
+ </html>

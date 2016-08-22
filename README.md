@@ -1,2 +1,2 @@
 # Jerdy-Inspector
-HTML DOM Inspector
+An HTML-DOM Inspector
