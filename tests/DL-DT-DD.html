@@ -1,0 +1,11 @@
+  <details onclick="setTimeout(function () { this.getElementsByTagName('summary')[0].textContent = this.open ? 'Some files are available for testing purposes:' : 'Some files are available for testing purposes, notably &quot;image&quot; is an image.' }.bind(this), 0)">
+    <summary>Some files are available for testing purposes, notably "image" is an image.</summary>
+    <dl>
+     <dt> <code>image</code> and <code>image.swf</code> <dd> a GIF image of two cats
+     <dt> <code>null</code> <dd> a PNG image of the word "null"
+     <dt> <code>flash-as-text</code> and <code>flash-as-text.swf</code> <dd> a Flash file sent as text/plain
+     <dt> <code>flash-as-image.swf</code> <dd> a Flash file sent as image/gif
+     <dt> <code>xml-broken</code> <dd> a malformed XML file
+     <dt> <code>download</code> <dd> the same file as <code>image</code>, but with a Content-Disposition header set to <code>inline</code> with a filename
+    </dl>
+  </details>

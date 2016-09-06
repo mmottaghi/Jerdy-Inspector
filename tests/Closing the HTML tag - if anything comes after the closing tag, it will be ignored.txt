@@ -1,0 +1,21 @@
+This test verifies that </html> is ignored when comething comes after it
+for example 
+<html>
+ hello
+</html>
+ hello again
+ 
+
+expected tree: Must start with >root
+@ignore_attribs = false
+>root (0, 0:345, 0)
+	>comment (0, 1:139, 138)
+	html (0, 142:345, 197)
+		head (0, 150:150, 0)
+		body (0, 150:345, 195)
+			h1 (2, 159:257, 66) <^null-attribempty-attrib= ^>
+
+			
+			
+
+			

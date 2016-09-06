@@ -1,0 +1,22 @@
+	In this test <html>, <head> and <body> tags appear multiple times: <head> has to be ignored if reappears
+  but <html> and <body> can introduce NEW attributes to the HTML and BODY nodes.
+  Already existing attributes won't be reassigned new value, in case they are seen not for the first time;
+  For example in <html ID=hid1> ... <html id=newVal> the value of ID will eventually be set to 'hid1'. 
+			
+@ignore_attribs = false
+>root (0, 0:1418, 0)
+	html (8, 0:1418, 1402) <^id=h-ID ^new-attrib=in-head ^head=after-head ^after=<head> is closed ^onload=LoadHTML() ^data-g=GG ^data-r=<R"R"R> ^class=hCls ^>
+		>comment (0, 19:424, 405)
+		head (0, 486:786, 293)
+			meta (0, 602:607, 0)
+			link (0, 612:617, 0)
+			>comment (0, 623:696, 73)
+		body (6, 849:1418, 527) <^body-data=custom<data> ^id=BDY-id ^class=BDY-cls ^onclick=BodyClicked(this, '- body -',434) ^style=color:red ^dir=ltr ^>
+			div (0, 894:1418, 519)
+				p (1, 903:1329, 416) <^id=PID ^>
+					table (0, 1009:1094, 78)
+						tbody (0, 1021:1094, 73)
+							tr (0, 1021:1094, 69)
+								td (0, 1025:1094, 65)
+					span (1, 1221:1318, 81) <^id=SPID ^>
+				dd (1, 1329:1413, 65) <^class=ddCL ^>

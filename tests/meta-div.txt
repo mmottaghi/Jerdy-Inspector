@@ -1,0 +1,14 @@
+<!-- In this test a header tag comes first (e.g. <link>, <meta> , ...) followed by a body tag (e.g. <div>, <p>, <img> ...).
+	The header tag implicitly brings the <head> tag with it and the other tag will be placed under <body>.
+	Any other header tag that comes after the second tag will not be placed under <head> anymore.
+ -->
+			
+>root (0, 0:361, 0)
+	>comment (0, 1:329, 328)
+	html (0, 337:361, 24)
+		head (0, 337:343, 6)
+			meta (0, 337:342, 0)
+		body (0, 343:361, 18)
+			div (0, 343:361, 13)
+				link (0, 350:355, 0)
+				div (0, 356:361, 0)

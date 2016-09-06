@@ -1,0 +1,27 @@
+<!DOCTYPE html this DOCTYPE must be loaded> 
+<! hello>
+
+<meta class meta-with-null-class>
+<base >
+<? hello ?>
+<link rel="stylesheet" type="text/css" href="theme.css">
+<! another comment >
+<!doctype this tag should be ignored and must NOT not be loaded onto the tree (not even as a comment)>
+<!-- HTML comment
+	<body>
+		this should not be loaded
+	</body>
+ -->
+
+ <title>Peppers</title>
+ <base href="http://www.somedomain.com/someDirectory/">
+ 
+ 
+</head>
+<? this comment must be loaded under the HTML node and NOT under the 'head' node>
+
+<base id=base_after_head_closed>
+<link class="loaded_under_head">
+<!-- This comment MUST be loaded under the HTML node -->
+<meta class="loaded_under_head">
+

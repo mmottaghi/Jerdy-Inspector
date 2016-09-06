@@ -1,0 +1,13 @@
+	In this test, a </body> is inserted in the <head> and it is expected to cause <head> to be closed 
+	@ignore_attribs = false
+
+>root (0, 0:452, 0)
+	>comment (0, 2:106, 104)
+	html (0, 109:452, 343)
+		head (1, 109:200, 71) <^class=HD-Test ^>
+			meta (2, 132:167, 0) <^class=under <head> ^id=meta1 ^>
+			link (1, 171:197, 0) <^class=under <head> ^>
+		body (0, 200:452, 0)
+			meta (2, 298:333, 0) <^class=under <body> ^id=meta2 ^>
+			link (1, 337:363, 0) <^class=under <body> ^>
+			span (0, 375:442, 61)

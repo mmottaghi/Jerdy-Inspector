@@ -1,0 +1,19 @@
+This test verifies that non-table tags (such as <object>) inside a <table> tag are placed 
+immediately before <table> as an immediately-preceding sibling, although they appear 
+AFTER <table> in the HTML.
+
+@ignore_attribs = false
+>root (0, 0:87, 0)
+	html (0, 0:87, 87)
+		head (0, 0:0, 0)
+		body (0, 0:87, 87)
+			object (1, 7:22, 0) <^id=obj ^>
+			table (0, 0:87, 80)
+				tfoot (1, 22:52, 15) <^id=foot ^>
+					tr (0, 40:52, 12)
+						td (1, 40:52, 4) <^td1>
+				tbody (1, 52:87, 21) <^id=bdy ^>
+					tr (0, 70:87, 17)
+						td (1, 70:87, 9) <^td2>
+							>comment (0, 80:86, 6)
+							

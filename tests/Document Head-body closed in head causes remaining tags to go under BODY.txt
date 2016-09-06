@@ -1,0 +1,8 @@
+<!-- in this test the LINK should be under <head> and META should be loaded under <body> -->
+>root (0, 0:147, 0)
+	html (0, 0:147, 147)
+		head (0, 0:20, 20)
+			link (1, 0:19, 0)
+		body (0, 20:147, 0)
+			meta (1, 27:50, 0)
+			>comment (0, 56:146, 90)

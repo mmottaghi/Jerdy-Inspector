@@ -1,0 +1,33 @@
+<html id="h-ID">
+<!-- In this test <html>, <head> and <body> tags appear multiple times: <head> has to be ignored if reappears
+  but <html> and <body> can introduce NEW attributes to the HTML and BODY nodes.
+  Already existing attributes won't be reassigned new value, in case they are seen not for the first time;
+  For example in <html ID=hid1> ... <html id=newVal> the value of ID will eventually be set to 'hid1'. -->
+	<html id=ignored><html id=ignored new-attrib=in-head>		
+	<head >	
+		<html id=ignored>		<html id=ignored new-attrib=ignored head=after-head>
+	<head class=to-be-ignored>
+		<meta>
+		<link>
+		<! only body and html tags can be repeated and add more (new) attributes !>
+		<head class=to-be-ignored-2 ID=to-be-ignored-3 >
+		<html id=ignored head=ignored>
+	</head>
+	<html new-attrib=ignored after="<head> is closed">
+ <body body-data="custom<data>" ID=BDY-id >
+	<div>
+		<p id=PID>
+			<body id=ID-to-be-ignored-4 CLASS = 'BDY-cls'>
+			<html onload="LoadHTML()" data-g=GG>
+		<table>
+			<tr><td>hello<html onload="must be ignored" ID= ignored-0-hID data-g>
+		</table>
+		
+		<body onclick="BodyClicked(this, '- body -',434)" style="color:red" id='ignored'>
+		<head class=ignored-1>
+		<span ID = SPID>
+			<html data-r='<R"R"R>' id=ignored-2 onload=ignored-3 class=hCls data-g >
+		</span>
+		<dd class = 'ddCL'>
+			<html><body	dir=ltr body-data=ignored-4><html class/id/>
+		</dd>

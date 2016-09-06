@@ -1,0 +1,34 @@
+
+<!-- In this test <TR> comes without table and shoud be ignored; 
+	Also Table is tested with TR and TD tags inside it (closed both explicitly and implicitly)
+ -->
+			
+<td to be ignored>
+<tr to be ignored>
+<td to be ignored>
+<tbody to be ignored>
+<thead to be ignored>
+<tfoot to be ignored>
+<tfoot to be ignored><td>
+<tfoot to be ignored><tr><td>
+
+<!-- all the above table tags must be ignored, and treated as text:<td> <thead> <tr> <tfoot> <tbody> -->
+
+<table comment="all the TR and TD tags under this TABLE must be loaded to DOM">
+	<tr><td> Cell 1.1<td> Cell 1.2<td> Cell 1.3
+	<tr><td> Cell 2.1</td><td id=   with-comment>Cell 2.2<?Comment for this TD?></td><td>Cell 2.3</td><! row comment!></tr>
+	<td>Implicit TR: 3.1
+	<td>Implicit TR: 3.2  </td>
+	<td>  Implicit TR: 3.3</td>
+</table>
+
+<table Id	='no<TR>'/class/style="color:red" > <!-- This table comes with no TR -->
+	<td>Injects a new TR</td>
+	<td>Uses the TR injected above, and does NOT inject any new TR.
+</table>
+
+<table Class	=no-tbody comment='<table> with <TFOOT> only'>
+	<tfoot>
+		<td>TR expected to be automatically injected
+	</tfoot>
+</table>

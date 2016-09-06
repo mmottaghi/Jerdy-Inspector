@@ -1,0 +1,23 @@
+<!-- Four different types of comments are tested here; they are different in the way they start.
+	They may start with <? or <! or <!-- or </ -->
+	
+<? Question mark ?>
+<! Exclamation mark >
+<//slash all these comments up to here must be placed under the ROOT node >
+
+<meta>
+<! Comment under head >
+</ slash under head >
+</head comment='this should tentatively close the implicit <head> tag, but other header tags (e.g. <meta>, <link>) will still be put under <head>'>
+
+<? Comment back under HTML ?></1slash under HTML >
+
+
+<body>
+	<! Exclamation comment under BODY >
+	</_Slash Comment under body >
+	
+	<div>	
+
+		<!-- another comment under <div> and not under <body> this is the standatd user comment -->
+	

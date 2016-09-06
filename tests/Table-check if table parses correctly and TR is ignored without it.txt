@@ -1,0 +1,38 @@
+<!-- In this test <TR> comes without table and shoud be ignored; 
+	Also Table is tested with TR and TD tags inside it (closed both explicitly and implicitly)
+ -->
+	@ignore_attribs = false
+>root (0, 0:1142, 0)
+	>comment (0, 3:165, 162)
+	html (0, 173:1142, 969)
+		head (0, 173:173, 0)
+		body (0, 173:1142, 969)
+			>comment (0, 363:465, 102)
+			table (1, 470:802, 253) <^comment=all the TR and TD tags under this TABLE must be loaded to DOM ^>
+				tbody (0, 552:802, 250)
+					tr (0, 552:598, 42)
+						td (0, 556:569, 9)
+						td (0, 569:582, 9)
+						td (0, 582:598, 12)
+					tr (0, 598:712, 110)
+						td (0, 602:615, 9)
+						td (1, 620:674, 31) <^id=with-comment ^>
+							>comment (0, 652:673, 21)
+						td (0, 679:691, 8)
+						>comment (0, 697:711, 14)
+					tr (0, 720:802, 82)
+						td (0, 720:743, 19)
+						td (0, 743:765, 18)
+						td (0, 773:795, 18)
+			table (3, 814:992, 133) <^id=no<TR> ^classstyle=color:red ^>
+				>comment (0, 861:895, 34)
+				tbody (0, 899:992, 93)
+					tr (0, 899:992, 93)
+						td (0, 899:919, 16)
+						td (0, 927:992, 61)
+			table (2, 1004:1134, 71) <^class=no-tbody ^comment=<table> with <TFOOT> only ^>
+				tfoot (0, 1066:1124, 51)
+					tr (0, 1077:1124, 47)
+						td (0, 1077:1124, 43)
+						
+						

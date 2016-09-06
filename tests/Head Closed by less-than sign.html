@@ -1,0 +1,10 @@
+	<!-- In this test, a <1-tag> is inserted in the <head> and it is expected to cause <head> to be closed -->
+<head class=HD-Test>
+	<meta class="under <head>">
+	<link class="under <head>">
+<1-tag ><head hint='this causes the <head> to be closed, not accepting any more <meta> or <link>' >
+	<meta class="under <body>">
+	<link class="under <body>">
+<body>
+	<div> Test closing <head> by a fake body-close tag</div>
+	

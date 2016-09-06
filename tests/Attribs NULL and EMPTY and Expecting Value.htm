@@ -1,0 +1,9 @@
+This test is to verify that uninitialized (standard and user-defined) attributes are distiguished from empty ones.
+
+<div ID=DV dir =" " null-attrib expecting-value = >
+	<span empty-attrib= "" another-val-expecting=>
+		<p another-empty="" class>
+			<a id class=""> Lin<b id>k</b></a>
+		<img width height="">
+	</span>
+</div>

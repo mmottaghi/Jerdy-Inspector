@@ -1,0 +1,171 @@
+# This is a Test-Description File (TDF) designed to test the nestability in the HTML parser.
+# Tag nestability determines how consecutive tgas are placed in the DOM tree. HTML tags normally behave similar to parantheses;
+# i.e., corresponding to every opening tag, there is a closing tag which marks the boundaries of an HTML element. 
+# But this is not always the case, as there are exceptions to it; for example void tags (such as <img>) do not require a closing tag.
+# Also, for some other tags (such as <td>, <li>, ...) the closing tag is optional. For instance, the sequence <p><div> should be
+# parsed similar to <p></p><div> as <div> closes any open <p> before it starts accepting new elements inside of itself.
+# 
+# In general, the parser, can place a newly-read tag before, after, or under the current open tag. The newly-read tag can also 
+# be ignored by the parser, or it can bring other implicit tags bafore it. For example, in <table><tr>, the <tr> tag brings
+# an implicit <tbody> before it, forming the table-tbody-tr chain. These nesting behaviors are defined by the HTML5 standard
+# and are given to the parser in the form of a table. Some of the behaviors are not restricted by the standard and are instead
+# implementation-specific. The expected behaviors in this test are extracted from the Chrome browser version 52.0.
+
+# The puspose of this test is to verify that the parser does indeed parse HTML pairs (prefixed by <table>) as expected by the standard.
+# The testing module generates an in-memory HTML string for each pair described in the test, gets it parsed by the parser, 
+# and compares the resulting parse tree with the expected nesting configuration. The pair could optionally be prefixed
+# by a global or set-specific prefix string.
+# 
+# Legends: (Expected Nesting Configurations)
+# 	L means [Lead] 		immediately-preceding sibling (the second tag must be placed immediately before the first tag)
+# 	. means [default]	immediately under (the second tag must be placed as a child immediately under the first tag)
+# 	C means [Close]		immediately-following sibling (the second tag must be placed immediately after the first tag)
+# 	i means [ignore]	the second tag is ignored due to the first tag
+# 	R means [Reversed]	the second is the parent (the first tag is among the children of the secnod tag)
+# 	^ means 			neither of tags is an ancestor of the other (e.g. <head><div>)
+# 	1-9 				indicates the distance between the first and the second tag (e.g. 2 means the second tag is two node-level away from the first tag)
+# 	x means 			skip the test for this pair
+# 
+# Test Set Description:
+#	Each test is composed of one or more sets, described in separate lines. Set descriptions start after '>start'. Lines after '>stop' are ignored. 
+# 	Defined in a separate line, each set starts by the name of the parent tag, followed by a sequence of symbols (LCiR^ etc.) each corresponding to the expected nesting
+# of the second tag. For example, with @childTags = { h1, tfoot, td } each test sets will generate 3 pairs: one with <h1>, one with <tfoot>, and another with <td>
+# threfore, to perform the test for <table> the set should be defined as follows:
+# 		table	L.3
+# in which L represents the expected nesting of <table><h1>. The set-specific prefix is defined after the parent tag name, as follows:
+# 		tr	{<table>}	xxx
+# which creates these strings: <table><tr><h1>, <table><tr><tfoot>, <table><tr><td>.
+
+@synopsis = "Nestability test prefixed with <table> for all HTML tag pairs"
+@testType = Nestability
+@globalPrefix= "<table> " 
+@onlyReportFailures = true
+
+@childTags = { 
+        table, 
+    hr, p, address, div, article,blockquote,  details, dl, fieldset, figcaption, figure, footer, header, hgroup, menu,ol, ul, nav,  pre, section,summary, aside, 
+    form, 
+    dd,dt, 
+    h1, h2, h3, h4, h5, h6, 
+    li, 
+    area, br, embed, img, param, source, track,
+    a,button, 
+    object, abbr, audio, b, bdi, bdo, canvas,
+    cite, code, datalist, del, dfn, dialog, em, 
+    i, ins, kbd, label, legend, map, mark,  menuitem, meter, 
+    output, progress, q, rp, rt, ruby, s, samp, small, span, strong, sub,  sup, time,  u, var, video, wbr, cus-tom,
+    base, command, link, meta, title,noscript, 
+	select, iframe, 
+	textarea, input, keygen, 
+	optgroup, option, 
+	script, style, 
+    caption, tbody, tfoot, thead, colgroup, col, td, th, tr, 
+	head, body,html
+}
+
+>start
+html	222222222222222222222223222222222222222222222222222222222222222222222222222222222222222222222222233333334554i1i
+body	1......................2.........................................................................22222223443iiR
+head	---------------------------------------------------------------------------------------------------------------
+caption	...................................................................................................CCCCC^^^^i^^
+td	...................................................................................................^^^^^^CC^i^^
+th	...................................................................................................^^^^^^CC^i^^
+col	^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^C^^^i^^
+colgroup	^^^^^^^^^^^^^^^^^^^^^^^C^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^CCCCCCC.^^^i^^
+tbody	^^^^^^^^^^^^^^^^^^^^^^^.^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^..CCCCC^22.i^^
+tfoot	^^^^^^^^^^^^^^^^^^^^^^^.^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^..CCCCC^22.i^^
+thead	^^^^^^^^^^^^^^^^^^^^^^^.^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^..CCCCC^22.i^^
+tr	^^^^^^^^^^^^^^^^^^^^^^^.^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^..^^^^^^..Ci^^
+table	CLLLLLLLLLLLLLLLLLLLLLL.LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL.......2332iR^
+select	^iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiCCC...i^^^^ii^^^ii^
+p	^CCCCCCCCCCCCCCCCCCCCCC.CCCCCCCCC..................................................................^^^^^^^^^iR^
+dd	^.......................CC.........................................................................^^^^^^^^^iR^
+dt	^.......................CC.........................................................................^^^^^^^^^iR^
+h1	^.........................CCCCCC...................................................................^^^^^^^^^iR^
+h2	^.........................CCCCCC...................................................................^^^^^^^^^iR^
+h3	^.........................CCCCCC...................................................................^^^^^^^^^iR^
+h4	^.........................CCCCCC...................................................................^^^^^^^^^iR^
+h5	^.........................CCCCCC...................................................................^^^^^^^^^iR^
+h6	^.........................CCCCCC...................................................................^^^^^^^^^iR^
+li	^...............................C..................................................................^^^^^^^^^iR^
+button	^........................................C.........................................................^^^^^^^^^iR^
+a	^.......................................C..........................................................^^^^^^^^^iR^
+cus-tom	^..................................................................................................^^^^^^^^^iR^
+option	^..............................................................................................CC..^^^^^^^^^iR^
+optgroup	^..................................................................................................^^^^^^^^^iR^
+object	^..................................................................................................^^^^^^^^^iR^
+form	^^^^^^^^^^^^^^^^^^^^^^^i^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^CCCCCCC^^^^i^^
+details	^..................................................................................................^^^^^^^^^iR^
+article	^..................................................................................................^^^^^^^^^iR^
+aside	^..................................................................................................^^^^^^^^^iR^
+blockquote	^..................................................................................................^^^^^^^^^iR^
+dl	^..................................................................................................^^^^^^^^^iR^
+fieldset	^..................................................................................................^^^^^^^^^iR^
+figcaption	^..................................................................................................^^^^^^^^^iR^
+figure	^..................................................................................................^^^^^^^^^iR^
+footer	^..................................................................................................^^^^^^^^^iR^
+header	^..................................................................................................^^^^^^^^^iR^
+hgroup	^..................................................................................................^^^^^^^^^iR^
+menu	^..................................................................................................^^^^^^^^^iR^
+nav	^..................................................................................................^^^^^^^^^iR^
+ol	^..................................................................................................^^^^^^^^^iR^
+pre	^..................................................................................................^^^^^^^^^iR^
+section	^..................................................................................................^^^^^^^^^iR^
+summary	^..................................................................................................^^^^^^^^^iR^
+ul	^..................................................................................................^^^^^^^^^iR^
+abbr	^..................................................................................................^^^^^^^^^iR^
+address	^..................................................................................................^^^^^^^^^iR^
+audio	^..................................................................................................^^^^^^^^^iR^
+bdi	^..................................................................................................^^^^^^^^^iR^
+bdo	^..................................................................................................^^^^^^^^^iR^
+canvas	^..................................................................................................^^^^^^^^^iR^
+cite	^..................................................................................................^^^^^^^^^iR^
+datalist	^..................................................................................................^^^^^^^^^iR^
+del	^..................................................................................................^^^^^^^^^iR^
+dfn	^..................................................................................................^^^^^^^^^iR^
+div	^..................................................................................................^^^^^^^^^iR^
+dialog	^..................................................................................................^^^^^^^^^iR^
+ins	^..................................................................................................^^^^^^^^^iR^
+kbd	^..................................................................................................^^^^^^^^^iR^
+label	^..................................................................................................^^^^^^^^^iR^
+legend	^..................................................................................................^^^^^^^^^iR^
+map	^..................................................................................................^^^^^^^^^iR^
+mark	^..................................................................................................^^^^^^^^^iR^
+menuitem	^..................................................................................................^^^^^^^^^iR^
+meter	^..................................................................................................^^^^^^^^^iR^
+output	^..................................................................................................^^^^^^^^^iR^
+progress	^..................................................................................................^^^^^^^^^iR^
+q	^..................................................................................................^^^^^^^^^iR^
+rp	^..................................................................................................^^^^^^^^^iR^
+rt	^..................................................................................................^^^^^^^^^iR^
+ruby	^..................................................................................................^^^^^^^^^iR^
+samp	^..................................................................................................^^^^^^^^^iR^
+span	^..................................................................................................^^^^^^^^^iR^
+sub	^..................................................................................................^^^^^^^^^iR^
+sup	^..................................................................................................^^^^^^^^^iR^
+time	^..................................................................................................^^^^^^^^^iR^
+var	^..................................................................................................^^^^^^^^^iR^
+video	^..................................................................................................^^^^^^^^^iR^
+b	^..................................................................................................^^^^^^^^^iR^
+code	^..................................................................................................^^^^^^^^^iR^
+em	^..................................................................................................^^^^^^^^^iR^
+i	^..................................................................................................^^^^^^^^^iR^
+s	^..................................................................................................^^^^^^^^^iR^
+small	^..................................................................................................^^^^^^^^^iR^
+strong	^..................................................................................................^^^^^^^^^iR^
+u	^..................................................................................................^^^^^^^^^iR^
+base	^CCCCCCCCCCCCCCCCCCCCCC^CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC^^^^^^^^^^^iR^
+command	^CCCCCCCCCCCCCCCCCCCCCC^CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC^^^^^^^^^^^iR^
+link	^CCCCCCCCCCCCCCCCCCCCCC^CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC^^^^^^^^^^^iR^
+meta	^CCCCCCCCCCCCCCCCCCCCCC^CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC^^^^^^^^^^^iR^
+area	^CCCCCCCCCCCCCCCCCCCCCC^CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC^^^^^^^^^^^iR^
+br	^CCCCCCCCCCCCCCCCCCCCCC^CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC^^^^^^^^^^^iR^
+embed	^CCCCCCCCCCCCCCCCCCCCCC^CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC^^^^^^^^^^^iR^
+hr	^CCCCCCCCCCCCCCCCCCCCCC^CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC^^^^^^^^^^^iR^
+img	^CCCCCCCCCCCCCCCCCCCCCC^CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC^^^^^^^^^^^iR^
+input	^CCCCCCCCCCCCCCCCCCCCCC^CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC^^^^^^^^^^^iR^
+keygen	^CCCCCCCCCCCCCCCCCCCCCC^CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC^^^^^^^^^^^iR^
+param	^CCCCCCCCCCCCCCCCCCCCCC^CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC^^^^^^^^^^^iR^
+source	^CCCCCCCCCCCCCCCCCCCCCC^CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC^^^^^^^^^^^iR^
+track	^CCCCCCCCCCCCCCCCCCCCCC^CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC^^^^^^^^^^^iR^
+wbr	^CCCCCCCCCCCCCCCCCCCCCC^CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC^^^^^^^^^^^iR^

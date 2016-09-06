@@ -1,0 +1,10 @@
+	<!-- In this test, a </body> is inserted in the <head> and it is expected to cause <head> to be closed -->
+<head class=HD-Test>
+	<meta class="under <head>" id=meta1>
+	<link class="under <head>">
+</body comment="this causes the <head> to be closed, not accepting any more <meta> or <link>" >
+	<meta class="under <body>" id=meta2>
+	<link class="under <body>">
+<body>
+	<span> Test closing <head must-be-ignored> by a fake body-close tag</span>
+	

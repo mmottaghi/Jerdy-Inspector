@@ -1,0 +1,20 @@
+<!-- Four different types of comments are tested here; they are different in the way they start.
+	They may start with <? or <! or <!-- or </ -->
+	
+>root (0, 0:724, 0)
+	>comment (0, 1:144, 143)
+	>comment (0, 151:168, 17)
+	>comment (0, 172:191, 19)
+	>comment (0, 195:268, 73)
+	html (0, 273:724, 451)
+		head (0, 273:329, 56)
+			meta (0, 273:278, 0)
+			>comment (0, 282:303, 21)
+			>comment (0, 307:326, 19)
+		>comment (0, 481:508, 27)
+		>comment (0, 510:529, 19)
+		body (0, 536:724, 182)
+			>comment (0, 546:579, 33)
+			>comment (0, 584:611, 27)
+			div (0, 618:724, 101)
+				>comment (0, 631:720, 89)
