@@ -250,7 +250,7 @@ void __fastcall TfrmMain::BrowseItemClicked(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall TfrmMain::OpenFromBrowseSet()
 {
-  if (loaded_browse_item_index >= 0)
+  if (loaded_browse_item_index >= 0 && loaded_browse_item_index < mnuBrowse->Count)
     OpenHtmlFile((browse_directory + mnuBrowse->Items[loaded_browse_item_index]->Caption).c_str());
 }
 //---------------------------------------------------------------------------

@@ -3,10 +3,10 @@
 #include <vcl.h>
 #pragma hdrstop
 //---------------------------------------------------------------------------
-USEFORM("src\fmMain.cpp", frmMain);
 USEFORM("src\FZoomableTree.cpp", ZoomableTree); /* TFrame: File Type */
 USEFORM("src\fmAbout.cpp", frmAbout);
 USEFORM("src\fmStats.cpp", frmStats);
+USEFORM("src\fmMain.cpp", frmMain);
 //---------------------------------------------------------------------------
 WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
@@ -36,4 +36,3 @@ WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
   return 0;
 }
 //---------------------------------------------------------------------------
-
